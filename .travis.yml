@@ -1,0 +1,22 @@
+sudo: required
+language: javascript
+services:
+- docker
+env:
+  global:
+  - IMAGE_NAME=alexlapinski/build-typescript
+  - REGISTRY_USER=alexlapinski
+  - secure: Gf9CE6e8g7zEjUu7fJOkQ3T22DG+1W5NrRinwlWpLPbxxMv8UjwvOSvHPEan2CM05CmLfyG7wHr6NuGhDMizmYXMBj1zdA/aGdmwGcsXo5FnbJaWBQPMJ6oVmX+84kaukXe7BW6jZ0ZcdcMcgPC1fYtOKUtxQvjXZES7EohTzBip7jLqpev0V1N1arg50YF/4PhgxazFoYZz2cDRYWGRAQ7wCcVxmc2LDG0HohhhpYtwT+NazRrjfzWPyQleeZpU30U5s45dHdKchJ0ZwGikTaxNMccyjyidqpTTxu7vOeqs3QykdcSMPANN6v04PdlBPL1TYqUs+gMd2QOiqfj+Em8WOEEkttDDc6FJgDpkoAHehA0n6QnF07HcF0icM02doy2r/gQ7qlc0CYzgLpjgkiQC/OAuG+sI2xuD02BSAwxNLp8G4jkB2EyNzpeToo8iQhpyje7NsNFP3fUOdK47/yW4VghMSAjBBZXUy6m706+f/JrwWzLr+RwCJL4796HC6dP9/AUccUSvjLpk8O8U5vmGosF6xSEfqjz2VwrFExRs4ATDHZJKOyhiu1/2OvYfKXRzeECDVi+HTZHAyqH3Tp6DKMlH1qpxUAsju+Co1/Nm4n738X/IDbA7xBY5NoD0ZC+HYAgpx630jeBaHqm278+SzUwaPlmVp3Oiq+/8fhM=
+before_script:
+- version="$(awk '/LABEL version="(.*)"/ { print $2; }' Dockerfile | sed 's/version="\([^"]*\)"/\1/')"
+- docker pull "$IMAGE_NAME" || true
+script: docker build -t $IMAGE_NAME .
+before_deploy:
+  - docker login -u "$REGISTRY_USER" -p "$REGISTRY_PASS"
+  - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:latest"
+  - docker tag "$IMAGE_NAME" "${IMAGE_NAME}:${version}"
+deploy:
+  provider: script
+  script: docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${version}"
+  on:
+    branch: master
