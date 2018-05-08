@@ -1,6 +1,8 @@
 # tools.build.docker.typescript
 A docker image for transpiling typesript apps
 
+[![Build Status](https://travis-ci.org/alexlapinski/tools.build.docker.typescript.svg?branch=master)](https://travis-ci.org/alexlapinski/tools.build.docker.typescript)
+
 ## Building
 ### Locally
 Run the following docker command:
